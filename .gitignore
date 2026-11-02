@@ -1,0 +1,19 @@
+# Created by scripts/setup_env.sbatch (large, downloaded or rebuilt)
+.venv/
+.uv_cache/
+hf_cache/
+checkpoints/
+data/
+
+# Created by scripts/run_bench.sbatch
+results/full/
+logs/*
+!logs/.gitkeep
+
+# Working files not needed to reproduce the benchmark
+results/lab/
+results/smoke/
+guides/build/
+
+__pycache__/
+*.pyc

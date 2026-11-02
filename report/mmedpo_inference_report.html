@@ -1,0 +1,163 @@
+<title>MMedPO Inference on HGX-01</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column; verdict and three key figures up top, then the measurement table, then method and caveats. */
+:root {
+  --bg: #f6f8f9;
+  --surface: #ffffff;
+  --fg: #16212b;
+  --muted: #566573;
+  --rule: #d6dee4;
+  --accent: #0b6e80;
+  --accent-soft: #e2f1f3;
+  --good: #1d7a46;
+  --warn: #9a5b00;
+  --font-display: "Newsreader", "Iowan Old Style", Georgia, serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1519; --surface: #161f25; --fg: #e3eaee; --muted: #93a3ae; --rule: #2a3741;
+    --accent: #5cc3d3; --accent-soft: #15313a; --good: #5fcf8e; --warn: #e3a64a; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1519; --surface: #161f25; --fg: #e3eaee; --muted: #93a3ae; --rule: #2a3741;
+  --accent: #5cc3d3; --accent-soft: #15313a; --good: #5fcf8e; --warn: #e3a64a; color-scheme: dark;
+}
+body {
+  background: var(--bg); color: var(--fg);
+  font: 15px/1.6 var(--font-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+main { max-width: 820px; margin: 0 auto; padding-block: 40px 64px; display: grid; gap: 40px; }
+section { display: grid; gap: 14px; min-width: 0; }
+h1, h2 { font-family: var(--font-display); font-weight: 600; text-wrap: balance; margin: 0; line-height: 1.2; }
+h1 { font-size: clamp(28px, 5vw, 40px); }
+h2 { font-size: 23px; }
+p, ul { margin: 0; max-width: 68ch; }
+ul { padding-left: 1.2em; display: grid; gap: 8px; }
+.eyebrow { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+code, .mono { font-family: var(--font-mono); font-size: .9em; }
+a { color: var(--accent); }
+header { display: grid; gap: 12px; }
+.verdict { display: inline-flex; align-items: center; gap: 8px; width: fit-content; padding: 6px 12px; border-radius: 999px;
+  background: var(--accent-soft); color: var(--accent); font-weight: 600; font-size: 14px; }
+.verdict::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--good); }
+.figures { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.fig { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 16px; display: grid; gap: 4px; align-content: start; }
+.fig .num { font: 500 26px/1.15 var(--font-mono); font-variant-numeric: tabular-nums; }
+.fig .num small { font-size: 14px; color: var(--muted); }
+.fig .lbl { font-size: 13px; color: var(--muted); }
+.table-wrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 8px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+th, td { padding: 9px 12px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--rule); font-variant-numeric: tabular-nums; }
+th:first-child, td:first-child { text-align: left; }
+thead th { font-weight: 600; font-size: 12px; color: var(--muted); background: var(--bg); vertical-align: bottom; }
+tbody tr:last-child td { border-bottom: 0; }
+td.num { font-family: var(--font-mono); }
+td .sub { display: block; font-size: 12px; color: var(--muted); font-family: var(--font-body); }
+.note { font-size: 13px; color: var(--muted); }
+dl.kv { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 18px; margin: 0; }
+dl.kv dt { color: var(--muted); }
+dl.kv dd { margin: 0; min-width: 0; }
+.flag { display: inline-block; font: 500 11px/1 var(--font-mono); letter-spacing: .05em; text-transform: uppercase;
+  padding: 3px 6px; border-radius: 4px; margin-right: 6px; vertical-align: 1px; }
+.flag.warn { color: var(--warn); border: 1px solid currentColor; }
+.flag.info { color: var(--accent); border: 1px solid currentColor; }
+pre { margin: 0; padding: 12px 14px; background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; overflow-x: auto;
+  font: 12.5px/1.55 var(--font-mono); }
+@media (max-width: 620px) {
+  .figures { grid-template-columns: minmax(0, 1fr); }
+  dl.kv { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  dl.kv dd { margin-bottom: 8px; }
+}
+</style>
+
+<main>
+  <header>
+    <span class="eyebrow">MRI project · focus paper · arXiv 2412.06141 (ICML 2025)</span>
+    <h1>MMedPO inference on the HGX-01 cluster</h1>
+    <span class="verdict">Runs on the cluster. Memory is not a constraint.</span>
+    <p>The released MMedPO model (LLaVA-Med v1.5, Mistral-7B, with MMedPO LoRA weights merged in) ran on the full public test sets inside a Slurm batch job on <span class="mono">hgx-01</span>. Each run used a single B200 GPU and the authors' own inference settings. One test set, MIMIC-CXR, needs credentialed access, so the MIMIC checkpoint was timed on IU-Xray images instead (see notes).</p>
+  </header>
+
+  <div class="figures" aria-label="Key figures">
+    <div class="fig"><span class="num">16.8 <small>/ 183 GB</small></span><span class="lbl">Peak GPU memory on one B200 (9%)</span></div>
+    <div class="fig"><span class="num">0.12–0.19 <small>s</small></span><span class="lbl">Mean time per VQA question, image to answer</span></div>
+    <div class="fig"><span class="num">0.7–1.0 <small>s</small></span><span class="lbl">Mean time per chest X-ray report</span></div>
+  </div>
+
+  <section>
+    <h2>Inference time per test set</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Run</th><th>Samples</th><th>Per sample<br>mean</th><th>Generate<br>median</th><th>Generate<br>p90</th><th>Generate<br>max</th>
+            <th>First token</th><th>Output tokens<br>mean</th><th>Decode<br>tok/s</th><th>Whole set</th><th>Peak GPU<br>mem</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>VQA-RAD<span class="sub">VQA-RAD checkpoint</span></td><td class="num">451</td><td class="num">0.188 s</td><td class="num">0.065 s</td><td class="num">0.284 s</td><td class="num">0.74 s</td><td class="num">0.036 s</td><td class="num">11</td><td class="num">118</td><td class="num">1.7 min</td><td class="num">16.6 GB</td></tr>
+          <tr><td>SLAKE (English)<span class="sub">SLAKE checkpoint</span></td><td class="num">1,061</td><td class="num">0.124 s</td><td class="num">0.063 s</td><td class="num">0.146 s</td><td class="num">0.72 s</td><td class="num">0.035 s</td><td class="num">7</td><td class="num">124</td><td class="num">2.4 min</td><td class="num">16.6 GB</td></tr>
+          <tr><td>IU-Xray report<span class="sub">IU-Xray checkpoint</span></td><td class="num">590</td><td class="num">0.734 s</td><td class="num">0.645 s</td><td class="num">0.908 s</td><td class="num">1.49 s</td><td class="num">0.035 s</td><td class="num">64</td><td class="num">94</td><td class="num">7.5 min</td><td class="num">16.6 GB</td></tr>
+          <tr><td>MIMIC checkpoint<span class="sub">on IU-Xray images (stand-in)</span></td><td class="num">590</td><td class="num">0.997 s</td><td class="num">0.921 s</td><td class="num">1.285 s</td><td class="num">11.13 s</td><td class="num">0.034 s</td><td class="num">92</td><td class="num">108</td><td class="num">10.0 min</td><td class="num">16.8 GB</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">“Per sample” includes reading the image, preprocessing it and generating the answer. The “Generate” columns time the model call alone. Statistics leave out the first 3 warm-up samples of each run. “Whole set” is the summed per-sample time on one GPU, excluding the one-time model load.</p>
+    <p class="note">Model load takes 17 s when one copy loads alone. With four copies loading at once from <span class="mono">/home</span>, it took 36–45 s.</p>
+  </section>
+
+  <section>
+    <h2>Does the setup reproduce the paper?</h2>
+    <p>As a quick check, I scored the closed-ended (yes/no) answers: correct if the reference answer appears in the first three words of the model's reply. This is cruder than the paper's evaluation script, but it lands close to the paper's numbers:</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Dataset</th><th>Closed-ended accuracy, this run</th><th>Paper, Table 1 (MMedPO)</th></tr></thead>
+        <tbody>
+          <tr><td>SLAKE</td><td class="num">73.6%</td><td class="num">73.08%</td></tr>
+          <tr><td>VQA-RAD</td><td class="num">64.9%</td><td class="num">66.54%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The IU-Xray reports read like real radiology findings and closely match the reference reports, e.g. “normal heart size and mediastinal contours… lungs are clear… no pleural effusion or pneumothorax”.</p>
+  </section>
+
+  <section>
+    <h2>What was measured</h2>
+    <dl class="kv">
+      <dt>Model</dt><dd><span class="mono">microsoft/llava-med-v1.5-mistral-7b</span> + MMedPO LoRA (r = 128) from <span class="mono">zky11235/mmedpo_checkpoints</span>, merged at load time. CLIP ViT-L/14-336 image encoder, 576 image tokens per image.</dd>
+      <dt>Settings</dt><dd>As in the authors' scripts: fp16, batch size 1, <span class="mono">vicuna_v1</span> prompt, temperature 0.2 sampling, at most 64 new tokens for VQA and 1,024 for reports.</dd>
+      <dt>Hardware</dt><dd>1× NVIDIA B200 (183 GB) on <span class="mono">hgx-01</span>, Slurm batch job 266, partition <span class="mono">hgx</span>. The four runs used four different GPUs at the same time.</dd>
+      <dt>Software</dt><dd>PyTorch 2.8.0 + CUDA 12.8, transformers 4.37.2, peft 0.11.1, Python 3.10.</dd>
+      <dt>Test sets</dt><dd>VQA-RAD test (451 QA), SLAKE English test (1,061 QA), IU-Xray test (590 studies, first view), all from public Hugging Face copies. The counts match the paper's Table 6.</dd>
+    </dl>
+  </section>
+
+  <section>
+    <h2>Notes and caveats</h2>
+    <ul>
+      <li><span class="flag warn">Env</span>The paper's environment (PyTorch 2.1.2) cannot run on B200 GPUs, which need sm_100 kernels. PyTorch 2.8 works, and the authors' model code ran without changes.</li>
+      <li><span class="flag warn">Slurm</span>Slurm on this cluster does not allocate GPUs (no GRES), so every job sees all 8 B200s. The job scripts pick an idle GPU themselves. Another user's job on the same GPU would slow these timings down; all 8 GPUs were idle during this run.</li>
+      <li><span class="flag warn">Data</span>MIMIC-CXR needs PhysioNet credentialed access, so the MIMIC checkpoint was timed on IU-Xray chest X-rays. That gives its compute cost, not its report quality. On these out-of-domain images it sometimes repeats itself: 7 of 590 reports ran to the 1,024-token cap, about 11 s each.</li>
+      <li><span class="flag info">Cost</span>MMedPO changes only the weights. The LoRA is merged in, so the network has the same size and per-token cost as plain LLaVA-Med v1.5. Only the answer length can differ. (This follows from the architecture; I did not time the base model separately.)</li>
+      <li><span class="flag info">Headroom</span>At batch size 1, generation runs at about 8–10 ms per token. That speed is limited by Python and per-token kernel-launch overhead, not by the GPU, which stays mostly idle. The authors' script already spreads a test set across GPUs with <span class="mono">torchrun</span>, which should cut the whole-set times roughly in proportion to the number of GPUs. I have not measured that.</li>
+      <li><span class="flag info">Training</span>Not measured. The paper reports 2–3 hours on 4× RTX A6000 (48 GB) for LoRA preference training. Each B200 has almost 4× the memory of an A6000.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Reproduce</h2>
+    <p>Everything lives in <span class="mono">~/MRI-MMedPO</span> on the cluster: the environment, weights, test sets, scripts, logs, and every per-sample answer with its timings.</p>
+<pre>sbatch ~/MRI-MMedPO/scripts/setup_env.sbatch   # env + weights + test sets (CPU only)
+sbatch ~/MRI-MMedPO/scripts/run_bench.sbatch   # 4 timed runs, one idle B200 each
+~/MRI-MMedPO/.venv/bin/python ~/MRI-MMedPO/scripts/summarize.py</pre>
+  </section>
+</main>

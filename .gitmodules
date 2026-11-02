@@ -1,0 +1,3 @@
+[submodule "MMedPO"]
+	path = MMedPO
+	url = https://github.com/aiming-lab/MMedPO.git
