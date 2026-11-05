@@ -5,13 +5,13 @@
 #SBATCH -t 01:30:00
 #SBATCH -o logs/%x-%j.out
 # Builds the Python env and downloads model weights + test sets (no GPU work).
-# Run from the repository root: sbatch scripts/setup_env.sbatch  (without Slurm: bash scripts/setup_env.sbatch)
+# Run from this exercise's folder: sbatch scripts/setup_env.sbatch  (without Slurm: bash scripts/setup_env.sbatch)
 set -euo pipefail
 W=${SLURM_SUBMIT_DIR:-$(pwd)}
 UV=${UV:-$(command -v uv || echo "$HOME/.local/bin/uv")}
 export W HF_HOME=$W/hf_cache UV_CACHE_DIR=$W/.uv_cache HF_HUB_ENABLE_HF_TRANSFER=1
 cd $W
-[ -f scripts/bench_inference.py ] || { echo "run this from the repository root"; exit 1; }
+[ -f scripts/bench_inference.py ] || { echo "run this from exercises/01-mmedpo-inference"; exit 1; }
 [ -x "$UV" ] || { echo "uv not found; install it with: curl -LsSf https://astral.sh/uv/install.sh | sh"; exit 1; }
 
 # --- MMedPO code (git submodule, pinned to the commit we ran) -------------------
@@ -39,7 +39,7 @@ snapshot_download("zky11235/mmedpo_checkpoints", local_dir=f"{W}/checkpoints/mme
 EOF
 # LLaVA's loader only takes the LoRA-merge path when the folder name contains "lora".
 for ds in iuxray mimic slake vqa-rad; do
-  ln -sfn $W/checkpoints/mmedpo_checkpoints/llava-med-1.5_${ds}_mmedpo $W/checkpoints/llava-med-1.5_${ds}_mmedpo_lora
+  ln -sfn mmedpo_checkpoints/llava-med-1.5_${ds}_mmedpo $W/checkpoints/llava-med-1.5_${ds}_mmedpo_lora
 done
 
 # --- Test sets ----------------------------------------------------------------

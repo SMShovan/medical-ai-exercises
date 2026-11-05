@@ -1,19 +1,19 @@
-# Created by scripts/setup_env.sbatch (large, downloaded or rebuilt)
-.venv/
-.uv_cache/
-hf_cache/
-checkpoints/
-data/
+# Each exercise keeps its large, downloaded or rebuilt files inside its own folder.
+exercises/*/.venv/
+exercises/*/.uv_cache/
+exercises/*/hf_cache/
+exercises/*/checkpoints/
+exercises/*/models/
+exercises/*/data/
+exercises/*/results/full/
+exercises/*/results/smoke/
+exercises/*/logs/*
+!exercises/*/logs/.gitkeep
 
-# Created by scripts/run_bench.sbatch
-results/full/
-logs/*
-!logs/.gitkeep
-
-# Working files not needed to reproduce the benchmark
-results/lab/
-results/smoke/
-guides/build/
+# Exercise 1 working files that are not needed to reproduce it
+exercises/01-mmedpo-inference/results/lab/
+exercises/01-mmedpo-inference/guides/build/
+exercises/01-mmedpo-inference/guides/MMedPO_Install_and_Run_Guide.pdf
 
 __pycache__/
 *.pyc
