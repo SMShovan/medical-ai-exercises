@@ -13,7 +13,7 @@ The focus is speed and resources. Dice, the overlap with the expert's tumour out
 
 ## Results
 
-hgx-01, NVIDIA B200 (183 GB), nnU-Net 2.8.1, PyTorch 2.8 (CUDA 12.8), 5 November 2026. The raw files are in [`results/reference/`](results/reference). The model is nnU-Net `3d_fullres` (88.6M parameters, 128 × 128 × 128 patches at 1 mm), applied to the first post-contrast phase.
+hgx-01, NVIDIA B200 (183 GB), nnU-Net 2.8.1, PyTorch 2.8 (CUDA 12.8), 5 November 2026. The raw files are in [`results/reference/`](results/reference). The model is nnU-Net `3d_fullres` (a 3D U-Net with 31.2M parameters, 128 × 128 × 128 patches at 1 mm), applied to the first post-contrast phase.
 
 ### Inference, one scan at a time
 
