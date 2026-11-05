@@ -1,0 +1,32 @@
+{
+  "tag": "k8_run3",
+  "folds": [
+    0
+  ],
+  "mirroring": true,
+  "phase": 1,
+  "gpu": "NVIDIA B200",
+  "torch": "2.8.0+cu128",
+  "patch_size": [
+    128,
+    128,
+    128
+  ],
+  "n_cases": 24,
+  "n_timed": 22,
+  "model_load_s": 7.728605950978817,
+  "weights_gpu_mem_gb": 0.0,
+  "peak_gpu_mem_gb": 1.470953472,
+  "peak_gpu_reserved_gb": 1.7825792,
+  "read_s_mean": 0.020690834091510624,
+  "preprocess_s_mean": 1.4425393036402634,
+  "predict_s_mean": 17.980720590043347,
+  "export_s_mean": 0.4057739858174252,
+  "total_s_mean": 19.849724713592547,
+  "total_s_median": 17.848959260008996,
+  "total_s_p90": 35.66886853610633,
+  "n_patches_mean": 16.454545454545453,
+  "dice_mean": 0.7249498821158951,
+  "dice_reported_mean": 0.716475,
+  "total_inference_s": 447.40966003603535
+}
